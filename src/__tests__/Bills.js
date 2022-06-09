@@ -9,6 +9,7 @@ import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 
 import router from "../app/Router.js";
+import { formatDate } from "../app/format.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -29,13 +30,13 @@ describe("Given I am connected as an employee", () => {
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
+      const datesExpected = bills.map(bill => bill.date)
       document.body.innerHTML = BillsUI({ data: bills })
-      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      console.log('dates: '+ dates)
-      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      const datesSorted = [...dates].sort(antiChrono)
+      const dates = screen.getAllByTestId('bill-date').map(date => date.textContent)
+      const datesSorted = datesExpected.sort((a,b) => new Date(b) - new Date(a)).map(date => formatDate(date))
       console.log('datesSortes: '+datesSorted)
       expect(dates).toEqual(datesSorted)
     })
   })
 })
+ 
