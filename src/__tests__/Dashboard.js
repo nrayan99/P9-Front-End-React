@@ -48,46 +48,92 @@ describe('Given I am connected as an Admin', () => {
   })
 
   describe('When I am on Dashboard page and I click on arrow', () => {
-    test('Then, tickets list should be unfolding, and cards should appear', async () => {
+    describe('When list is not unfolded yet', () => {
+      test('Then, tickets list should be unfolding, and cards should appear', async () => {
 
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
 
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Admin'
-      }))
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Admin'
+        }))
 
-      const dashboard = new Dashboard({
-        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+        const dashboard = new Dashboard({
+          document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+        })
+        document.body.innerHTML = DashboardUI({ data: { bills } })
+
+        const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
+        const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))
+        const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))
+
+        const icon1 = screen.getByTestId('arrow-icon1')
+        const icon2 = screen.getByTestId('arrow-icon2')
+        const icon3 = screen.getByTestId('arrow-icon3')
+
+        icon1.addEventListener('click', handleShowTickets1)
+        userEvent.click(icon1)
+        expect(handleShowTickets1).toHaveBeenCalled()
+        await waitFor(() => screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`) )
+        expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
+        icon2.addEventListener('click', handleShowTickets2)
+        userEvent.click(icon2)
+        expect(handleShowTickets2).toHaveBeenCalled()
+        await waitFor(() => screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`) )
+        expect(screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`)).toBeTruthy()
+
+        icon3.addEventListener('click', handleShowTickets3)
+        userEvent.click(icon3)
+        expect(handleShowTickets3).toHaveBeenCalled()
+        await waitFor(() => screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`) )
+        expect(screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`)).toBeTruthy()
       })
-      document.body.innerHTML = DashboardUI({ data: { bills } })
+    })
+    describe('When list is already unfolded', () => {
+      test('Then, tickets list should be folding, and cards should disappear', async () => {
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
 
-      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
-      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))
-      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Admin'
+        }))
 
-      const icon1 = screen.getByTestId('arrow-icon1')
-      const icon2 = screen.getByTestId('arrow-icon2')
-      const icon3 = screen.getByTestId('arrow-icon3')
+        const dashboard = new Dashboard({
+          document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+        })
+        document.body.innerHTML = DashboardUI({ data: { bills } })
 
-      icon1.addEventListener('click', handleShowTickets1)
-      userEvent.click(icon1)
-      expect(handleShowTickets1).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`) )
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
-      icon2.addEventListener('click', handleShowTickets2)
-      userEvent.click(icon2)
-      expect(handleShowTickets2).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`) )
-      expect(screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`)).toBeTruthy()
+        const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
+        const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))
+        const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))
 
-      icon3.addEventListener('click', handleShowTickets3)
-      userEvent.click(icon3)
-      expect(handleShowTickets3).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`) )
-      expect(screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`)).toBeTruthy()
+        const icon1 = screen.getByTestId('arrow-icon1')
+        const icon2 = screen.getByTestId('arrow-icon2')
+        const icon3 = screen.getByTestId('arrow-icon3')
+
+        icon1.addEventListener('click', handleShowTickets1)
+        userEvent.click(icon1)
+        expect(handleShowTickets1).toHaveBeenCalled()
+        userEvent.click(icon1)
+        expect(handleShowTickets1).toHaveBeenCalled()
+        await waitFor(() => expect(() => screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`) ).toThrow() )
+        icon2.addEventListener('click', handleShowTickets2)
+        userEvent.click(icon2)
+        expect(handleShowTickets2).toHaveBeenCalled()
+        userEvent.click(icon2)
+        expect(handleShowTickets2).toHaveBeenCalled()
+        await waitFor(() => expect(() => screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`) ).toThrow() )
+        icon3.addEventListener('click', handleShowTickets3)
+        userEvent.click(icon3)
+        expect(handleShowTickets3).toHaveBeenCalled()
+        userEvent.click(icon3)
+        expect(handleShowTickets3).toHaveBeenCalled()
+        await waitFor(() => expect(() => screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`) ).toThrow() )
+      })
     })
   })
 

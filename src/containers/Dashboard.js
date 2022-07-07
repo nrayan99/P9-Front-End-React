@@ -17,7 +17,9 @@ export const filteredBills = (data, status) => {
       /* istanbul ignore next */
       else {
         // in prod environment
+         /* istanbul ignore next */
         const userEmail = JSON.parse(localStorage.getItem("user")).email
+         /* istanbul ignore next */
         selectCondition =
           (bill.status === status) &&
           ![...USERS_TEST, userEmail].includes(bill.email)
