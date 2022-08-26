@@ -8,14 +8,14 @@ import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
-import { formatDate } from "../app/format.js";
+import { formatDate, formatStatus } from "../app/format.js";
 import userEvent from "@testing-library/user-event";
 import Bills from "../containers/Bills.js";
-
+import store from "../__mocks__/store";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    beforeAll(() => {
+    beforeEach(() => {
       const localBills = JSON.parse(JSON.stringify(bills))
       document.body.innerHTML = BillsUI({ data: localBills })
     })
@@ -36,9 +36,8 @@ describe("Given I am connected as an employee", () => {
     })
     test("Then bills should be ordered from earliest to latest", () => {
       const datesExpected = bills.map(bill => bill.date)
-      const dates = screen.getAllByTestId('bill-date').map(date => date.textContent)
       const datesSorted = datesExpected.sort((a,b) => new Date(b) - new Date(a)).map(date => formatDate(date))
-      console.log('datesSortes: '+datesSorted)
+      const dates = screen.getAllByTestId('bill-date').map(date => date.textContent)
       expect(dates).toEqual(datesSorted)
     })
     describe("When I click on new Bill", () => {
@@ -60,6 +59,43 @@ describe("Given I am connected as an employee", () => {
         userEvent.click(newBillButton)
         expect(handleClickNewBill).toHaveBeenCalled()
       })
+    })
+    describe("When I click on iconEye icon", () => {
+      test("Then I should see bill's image", () => {
+        $.fn.modal = jest.fn()
+        const iconEye = screen.getAllByTestId('icon-eye')[0]
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        const billsPage = new Bills({
+          document, onNavigate, store: store, localStorage: window.localStorage
+        })
+        const handleClickIconEye = jest.fn((e) => billsPage.handleClickIconEye( iconEye ))
+        iconEye.addEventListener('click', handleClickIconEye(iconEye))
+        userEvent.click(iconEye)
+        expect(handleClickIconEye).toHaveBeenCalled()
+      })
+    })
+    test("Then I should see my bills", async () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      bills.forEach(bill => {
+        bill.status = formatStatus(bill.status)
+      })
+      const billsPage = new Bills({
+        document, onNavigate, store: store, localStorage: window.localStorage
+      })
+      let billsOnBillsPage = await billsPage.getBills()
+      expect(billsOnBillsPage).toEqual(bills)
     })
   })
 })

@@ -21,8 +21,7 @@ const row = (bill) => {
   }
 
 const rows = (data) => {
-  console.log(data)
-  if(data && data.length) data.sort((a,b) =>{ return new Date(b.date) - new Date(a.date) })
+  if (data && data.length) data.sort((a,b) =>{ return new Date(b.date) - new Date(a.date) })
   let bills = data ? data.forEach(bill => bill.date = formatDate(bill.date)) : ''
   bills = data ? data.map(bill => row(bill)).join("") : ""
   return bills 
