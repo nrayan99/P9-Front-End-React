@@ -69,11 +69,16 @@ describe("Given I am connected as an employee", () => {
 
       screen.getByTestId('commentary').value = 'test'
 
-      const form = screen.getByTestId('form-new-bill')
       
-      fireEvent.submit(form)
+      const formSubmission = screen.getByTestId("form-new-bill")
 
-      expect(screen.getByText('Mes notes de frais')).toBeTruthy()
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+
+      formSubmission.addEventListener('submit', handleSubmit)
+
+      fireEvent.submit(formSubmission)
+
+      expect(handleSubmit).toHaveBeenCalled()
       
     })
   })
