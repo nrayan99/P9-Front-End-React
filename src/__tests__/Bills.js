@@ -94,8 +94,7 @@ describe("Given I am connected as an employee", () => {
       const billsPage = new Bills({
         document, onNavigate, store: store, localStorage: window.localStorage
       })
-      let billsOnBillsPage = await billsPage.getBills()
-      expect(billsOnBillsPage).toEqual(bills)
+      expect(screen.getByTestId('tbody').querySelectorAll('tr').length).toEqual(bills.length)
     })
   })
 })

@@ -5,11 +5,12 @@
 import { screen, fireEvent } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
-import { ROUTES } from "../constants/routes"
+import { ROUTES, ROUTES_PATH } from "../constants/routes"
 import store from "../__mocks__/store";
 
 
 describe("Given I am connected as an employee", () => {
+  // test d'intégration POST
   describe("When I am on NewBill Page", () => {
     test("Then I can change file", () => {
       const html = NewBillUI()
@@ -32,7 +33,7 @@ describe("Given I am connected as an employee", () => {
       expect(file.files[0]).toEqual(fakeFile)
       
     }),
-    test("Then I can submit a bill", () => {
+    test("Then I can submit a bill", async() => {
       const html = NewBillUI()
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee',
@@ -66,7 +67,13 @@ describe("Given I am connected as an employee", () => {
 
       screen.getByTestId('expense-name').value = 'Restaurant'
 
-      fireEvent.submit(screen.getByTestId('form-new-bill'))
+      screen.getByTestId('commentary').value = 'test'
+
+      const form = screen.getByTestId('form-new-bill')
+      
+      fireEvent.submit(form)
+
+      expect(screen.getByText('Mes notes de frais')).toBeTruthy()
       
     })
   })
