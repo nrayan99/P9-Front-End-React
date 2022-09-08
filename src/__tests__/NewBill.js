@@ -71,6 +71,8 @@ describe("Given I am connected as an employee", () => {
       
       const formSubmission = screen.getByTestId("form-new-bill")
 
+      newBill.updateBill = jest.fn()
+
       const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
 
       formSubmission.addEventListener('submit', handleSubmit)
@@ -79,6 +81,7 @@ describe("Given I am connected as an employee", () => {
 
       expect(handleSubmit).toHaveBeenCalled()
       
+      expect(newBill.updateBill).toHaveBeenCalled()
     })
   // test d'intégration POST
 
