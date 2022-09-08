@@ -82,7 +82,7 @@ describe("Given I am connected as an employee", () => {
     })
   // test d'intégration POST
 
-    test('create a new bill from mock API POST', async () => {
+    test('Then I can create a new bill from mock API POST', async () => {
 
       const bill = [{
 

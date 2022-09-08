@@ -46,9 +46,9 @@ describe("Given I am connected as an employee", () => {
     describe("When I click on new Bill", () => {
       test("I am redirect to new bill page", () => {
         const newBillButton = screen.getByTestId('btn-new-bill')
-        const onNavigate = (pathname) => {
+        const onNavigate = jest.fn((pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
-        }
+        })
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
@@ -60,6 +60,7 @@ describe("Given I am connected as an employee", () => {
         const handleClickNewBill = jest.fn((e) => billsPage.handleClickNewBill())
         newBillButton.addEventListener('click', handleClickNewBill)
         userEvent.click(newBillButton)
+        expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill'])
         expect(handleClickNewBill).toHaveBeenCalled()
       })
     })
